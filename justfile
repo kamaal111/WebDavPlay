@@ -8,23 +8,34 @@ run-dev:
     #!/bin/zsh
 
     . $DEVCONTAINER_VIRTUAL_ENVIRONMENT/bin/activate
-    python $MANAGE_PY migrate
+    just migrate-database $DEVCONTAINER_VIRTUAL_ENVIRONMENT
     python $MANAGE_PY runserver
 
-setup-dev-container: copy-to-container setup-zsh-environment setup-python-for-devcontainer
+setup-dev-container: copy-to-container setup-zsh-environment
+    just setup-python-environment $DEVCONTAINER_VIRTUAL_ENVIRONMENT
+    just migrate-database $DEVCONTAINER_VIRTUAL_ENVIRONMENT
 
 initialize-dev-container: copy-git-config-from-outside-container set-environment
 
 [private]
-setup-python-for-devcontainer:
+migrate-database virtual-environment:
     #!/bin/zsh
 
-    if [ ! -d $DEVCONTAINER_VIRTUAL_ENVIRONMENT ]
+    VIRTUAL_ENVIRONMENT="{{ virtual-environment }}"
+    . $VIRTUAL_ENVIRONMENT/bin/activate
+    python $MANAGE_PY migrate || exit 1
+
+[private]
+setup-python-environment virtual-environment:
+    #!/bin/zsh
+
+    VIRTUAL_ENVIRONMENT="{{ virtual-environment }}"
+    if [ ! -d $VIRTUAL_ENVIRONMENT ]
     then
-        python -m venv $DEVCONTAINER_VIRTUAL_ENVIRONMENT
+        python -m venv $VIRTUAL_ENVIRONMENT
     fi
 
-    . $DEVCONTAINER_VIRTUAL_ENVIRONMENT/bin/activate
+    . $VIRTUAL_ENVIRONMENT/bin/activate
 
     pip install poetry
 
