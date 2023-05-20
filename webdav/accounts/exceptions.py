@@ -1,4 +1,4 @@
-from http.client import CONFLICT, UNAUTHORIZED, BAD_REQUEST
+from http.client import CONFLICT, BAD_REQUEST
 from rest_framework.exceptions import APIException
 
 
@@ -8,12 +8,6 @@ class InvalidPayload(APIException):
 
     def __init__(self, detail: str, code=None):
         super().__init__(detail, code)
-
-
-class Unauthorized(APIException):
-    status_code = UNAUTHORIZED
-    default_detail = "Unauthorized."
-    default_code = "unauthorized"
 
 
 class UserAlreadyExists(APIException):
