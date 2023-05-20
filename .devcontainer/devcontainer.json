@@ -1,0 +1,29 @@
+{
+	"name": "WebDavPlay",
+	"dockerComposeFile": [
+		"../docker/docker-compose.services.yml",
+		"docker-compose.code.yml"
+	],
+	"service": "code",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"postCreateCommand": "just setup-dev-container && exit 0",
+	"initializeCommand": "just initialize-dev-container && exit 0",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
+                "python.defaultInterpreterPath": "/workspaces/WebDavPlay/.devcontainer/.venv/bin/python"
+			},
+			"extensions": [
+				"skellock.just",
+				"streetsidesoftware.code-spell-checker",
+                "ms-python.python"
+			]
+		}
+	},
+	"features": {
+		"ghcr.io/guiyomh/features/just:0": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+	},
+	"forwardPorts": []
+}

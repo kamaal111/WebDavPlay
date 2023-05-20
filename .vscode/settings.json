@@ -1,0 +1,14 @@
+{
+    "cSpell.words": [
+      "viewsets"
+    ],
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true
+    },
+    "python.formatting.provider": "none",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true
+}

@@ -1,0 +1,11 @@
+services:
+  db:
+    container_name: webdav-play-db
+    image: postgres:15
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_HOST_AUTH_METHOD: trust
