@@ -7,7 +7,7 @@ from webdav.accounts.controllers import UserController
 from webdav.accounts.serializers import UserSerializer
 
 
-class UserViewSet(
+class UsersViewSet(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
