@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from webdav.contacts.models import Contact
-from webdav.serializers.fields import BinaryField
+from webdav.serializer_fields import BinaryField
 
 
 class ContactSerializer(serializers.ModelSerializer):

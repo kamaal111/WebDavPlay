@@ -1,8 +1,10 @@
+from http.client import OK
+
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.parsers import FileUploadParser
-from django.http import Http404, HttpRequest
+from django.http import Http404, HttpRequest, FileResponse
 
 from webdav.contacts.models import Contact, ContactManager
 from webdav.contacts.serializers import ContactSerializer
@@ -31,6 +33,11 @@ class ContactsViewSet(
         return super().perform_create(serializer)
 
     @validate_uuid_pk
+    def retrieve(self, request, *args, **kwargs):
+        data = super().retrieve(request, *args, **kwargs).data
+        return FileResponse(data.get("content"), content_type="text/x-vcard")  # type: ignore
+
+    @validate_uuid_pk
     def update(self, request, *args, **kwargs):
         file = request.data.get("file")
         if file is None:
@@ -49,8 +56,8 @@ class ContactsViewSet(
         response = super().options(request, *args, **kwargs)
         return Response(
             data=response.data,
-            status=200,
-            headers={**response.headers, "Allows": "OPTIONS GET HEAD POST DELETE"},  # type: ignore
+            status=OK,
+            headers={**response.headers, "Allows": " ".join(["OPTIONS", "GET", "HEAD", "POST", "DELETE"])},  # type: ignore
         )
 
     def create(self, request: Request, *args, **kwargs):
