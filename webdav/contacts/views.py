@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from django.http import Http404, HttpRequest
 
-from webdav.contacts.models import Contact
+from webdav.contacts.models import Contact, ContactManager
 from webdav.contacts.serializers import ContactSerializer
 from webdav.utils import validate_uuid_pk
 
@@ -17,21 +17,15 @@ class ContactsViewSet(
     queryset = Contact.objects.all().order_by("id")
     serializer_class = ContactSerializer
 
+    def filter_queryset(self, queryset: ContactManager):
+        return queryset.filter(user=self.request.user)
+
     def perform_create(self, serializer):
         serializer.validated_data.setdefault("user", self.request.user)
         if id := self.kwargs.get("pk"):
             serializer.validated_data.setdefault("id", id)
 
         return super().perform_create(serializer)
-
-    def partial_update(self, request: Request, *args, **kwargs):
-        raise Http404
-
-    def create(self, request: Request, *args, **kwargs):
-        if request.method != "PUT":
-            raise Http404
-
-        return super().create(request, *args, **kwargs)
 
     @validate_uuid_pk
     def update(self, request: Request, *args, **kwargs):
@@ -49,3 +43,12 @@ class ContactsViewSet(
             status=200,
             headers={**response.headers, "Allows": "OPTIONS GET HEAD POST DELETE"},  # type: ignore
         )
+
+    def create(self, request: Request, *args, **kwargs):
+        if request.method != "PUT":
+            raise Http404
+
+        return super().create(request, *args, **kwargs)
+
+    def partial_update(self, request: Request, *args, **kwargs):
+        raise Http404
