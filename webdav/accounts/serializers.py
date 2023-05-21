@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
-from webdav.accounts.exceptions import InvalidPayload
+from webdav.exceptions import InvalidPayload
 
 
 @dataclass

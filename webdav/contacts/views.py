@@ -1,8 +1,11 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
+from rest_framework.request import Request
+from django.http import Http404, HttpRequest
 
 from webdav.contacts.models import Contact
 from webdav.contacts.serializers import ContactSerializer
+from webdav.utils import validate_uuid_pk
 
 
 class ContactsViewSet(
@@ -16,9 +19,30 @@ class ContactsViewSet(
 
     def perform_create(self, serializer):
         serializer.validated_data.setdefault("user", self.request.user)
+        if id := self.kwargs.get("pk"):
+            serializer.validated_data.setdefault("id", id)
+
         return super().perform_create(serializer)
 
-    def options(self, request, *args, **kwargs):
+    def partial_update(self, request: Request, *args, **kwargs):
+        raise Http404
+
+    def create(self, request: Request, *args, **kwargs):
+        if request.method != "PUT":
+            raise Http404
+
+        return super().create(request, *args, **kwargs)
+
+    @validate_uuid_pk
+    def update(self, request: Request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except Http404:
+            return self.create(request, *args, **kwargs)
+        except Exception:
+            raise  # unknown exception
+
+    def options(self, request: HttpRequest, *args, **kwargs):
         response = super().options(request, *args, **kwargs)
         return Response(
             data=response.data,
