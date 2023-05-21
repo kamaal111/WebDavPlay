@@ -1,10 +1,11 @@
 from rest_framework import serializers
 
 from webdav.contacts.models import Contact
+from webdav.serializers.fields import BinaryField
 
 
 class ContactSerializer(serializers.ModelSerializer):
-    content = serializers.CharField(required=True, min_length=30)
+    content = BinaryField(required=True)
 
     class Meta:
         model = Contact

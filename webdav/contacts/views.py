@@ -1,10 +1,12 @@
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.parsers import FileUploadParser
 from django.http import Http404, HttpRequest
 
 from webdav.contacts.models import Contact, ContactManager
 from webdav.contacts.serializers import ContactSerializer
+from webdav.exceptions import InvalidPayload
 from webdav.utils import validate_uuid_pk
 
 
@@ -16,6 +18,7 @@ class ContactsViewSet(
 ):
     queryset = Contact.objects.all().order_by("id")
     serializer_class = ContactSerializer
+    parser_classes = [FileUploadParser]
 
     def filter_queryset(self, queryset: ContactManager):
         return queryset.filter(user=self.request.user)
@@ -27,8 +30,17 @@ class ContactsViewSet(
 
         return super().perform_create(serializer)
 
+    def perform_update(self, serializer):
+        return super().perform_update(serializer)
+
     @validate_uuid_pk
-    def update(self, request: Request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
+        file = request.data.get("file")
+        if file is None:
+            raise InvalidPayload("No file provided.")
+
+        request.data.setdefault("content", file.read())
+
         try:
             return super().update(request, *args, **kwargs)
         except Http404:
