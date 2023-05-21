@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.http import Http404
 from rest_framework.authtoken.models import Token
-
-from webdav.exceptions import Unauthorized
+from rest_framework import exceptions
 
 
 class AuthenticationService:
@@ -11,16 +10,16 @@ class AuthenticationService:
         ...
 
     def authenticated_token(self, token: str):
-        if "Bearer" in token:
+        if "Token" in token:
             splitted_token = token.split(" ")
             if len(splitted_token) != 2:
-                raise Unauthorized
+                raise exceptions.AuthenticationFailed("Unauthorized.")
             token = splitted_token[1]
 
         try:
             return Token.objects.get(key=token)
         except Token.DoesNotExist as e:
-            raise Unauthorized from e
+            raise exceptions.AuthenticationFailed("Unauthorized.") from e
 
     def get_user_token(self, username: str | None, email: str | None, password: str):
         user = self.__get_authorized_user(
@@ -42,6 +41,6 @@ class AuthenticationService:
             raise Http404 from e
 
         if not check_password(password, user.password):
-            raise Unauthorized
+            raise exceptions.AuthenticationFailed("Unauthorized.")
 
         return user

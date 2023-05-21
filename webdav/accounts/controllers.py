@@ -8,7 +8,7 @@ from http.client import CREATED, OK
 
 from webdav.accounts.exceptions import UserAlreadyExists
 from webdav.accounts.serializers import CredentialsSerializer, UserSerializer
-from webdav.accounts.services import AuthenticationService
+from webdav.services import AuthenticationService
 
 
 class UserController:
