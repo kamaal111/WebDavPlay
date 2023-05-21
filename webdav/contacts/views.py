@@ -30,9 +30,6 @@ class ContactsViewSet(
 
         return super().perform_create(serializer)
 
-    def perform_update(self, serializer):
-        return super().perform_update(serializer)
-
     @validate_uuid_pk
     def update(self, request, *args, **kwargs):
         file = request.data.get("file")
@@ -59,6 +56,14 @@ class ContactsViewSet(
     def create(self, request: Request, *args, **kwargs):
         if request.method != "PUT":
             raise Http404
+
+        if id := kwargs.get("pk"):
+            try:
+                Contact.objects.get(id=id)
+            except Contact.DoesNotExist:
+                pass
+            else:
+                raise InvalidPayload("Invalid ID provided.")
 
         return super().create(request, *args, **kwargs)
 
